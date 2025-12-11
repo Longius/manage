@@ -2255,7 +2255,7 @@
             const initDingLogin = () => {
                 if (window.DTFrameLogin) {
                     window.DTFrameLogin({ id: 'qr-container', width: 260, height: 260 }, {
-                        redirect_uri: encodeURIComponent('http://43.157.15.51:8001'),
+                        redirect_uri: encodeURIComponent('https://longius.github.io/manage/'),
                         client_id: 'ding2bdc3cbiyutinlqj',
                         scope: 'openid corpid',
                         response_type: 'code',
@@ -2273,6 +2273,12 @@
                     const resp = await fetch(`https://manage-gw-daily.palmpay-inc.com/api/call-service/api/manage/callback?authCode=${encodeURIComponent(authCode)}`, { mode: 'cors' });
                     if (!resp.ok) throw new Error('请求失败');
                     console.log(await resp.json());
+                    const data = await response.json();
+                    if (data.respCode === '00000000' && data.data) {
+                        showMainPage();
+                    } else {
+                        showQRCodeView();
+                    }
                 } catch (error) {
                     console.error('fetchUserInfo error:', error);
                 }
