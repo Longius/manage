@@ -2141,7 +2141,6 @@
         // #region Main Initialization
         document.addEventListener('DOMContentLoaded', () => {
             const state = {
-                authKey: "",
                 isFirstLoad: true, // Set true in production environment usually
                 isQRCodeView: true
             };
@@ -2179,11 +2178,12 @@
                 //authKey = code;
                 if (state.isFirstLoad) {
                     showLoginPage();
-                    if (code) fetchUserInfo(code);
-                    else showQRCodeView();
                 } else {
                     showMainPage();
                 }
+                if (code) fetchUserInfo(code);
+                else showQRCodeView();
+
             };
 
             // --- Event Bindings ---
@@ -2257,7 +2257,7 @@
             const initDingLogin = () => {
                 if (window.DTFrameLogin) {
                     window.DTFrameLogin({ id: 'qr-container', width: 260, height: 260 }, {
-                        redirect_uri: encodeURIComponent('https://csm.tibric.top/'),
+                        redirect_uri: encodeURIComponent('https://csm.tibric.top'),
                         client_id: 'ding2bdc3cbiyutinlqj',
                         scope: 'openid corpid',
                         response_type: 'code',
@@ -2272,13 +2272,15 @@
 
             const fetchUserInfo = async (authCode) => {
                 try {
-                    const resp = await fetch(`https://manage-gw-daily.palmpay-inc.com/api/call-service/api/manage/callback?authCode=${encodeURIComponent(authCode)}`, { mode: 'cors' });
+                    const resp = await fetch(`https://ng-apptest.transspay.net/api/call-service/api/manage/loginCheck?authCode=${encodeURIComponent(authCode)}`, { mode: 'cors' });
                     if (!resp.ok) throw new Error('请求失败');
                     console.log(await resp.json());
                     const data = await response.json();
-                    if (data.respCode === '00000000' && data.data) {
+                    if (data.respCode === '00000000' && data.data.ok) {
+                        state.isFirstLoad = false;
                         showMainPage();
                     } else {
+                        state.isFirstLoad = true;
                         showQRCodeView();
                     }
                 } catch (error) {
